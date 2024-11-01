@@ -1,22 +1,20 @@
 from __init__ import CONN, CURSOR
 
-class Department:
-    def __init__(self, employee, year, manager, id=None):
-        self.employee = employee
-        self.id = id
-        self.year = year
-        self.manager = manager
 
+class Department:
+    def __init__(self, name, id=None):
+        self.name = name
+        self.id = id
+        
     def __repr__(self):
-        return f"{self.id}, {self.employee}, {self.manager}, {self.year}"
+        return f"{self.id}, {self.name}"
        
     @staticmethod
     def create_table():
         sql = """CREATE TABLE IF NOT EXISTS department (
             id INTEGER PRIMARY KEY,
-            employee TEXT,
-            manager TEXT,
-            year INTEGER
+            name TEXT
+
         );"""
         CURSOR.execute(sql)
         CONN.commit()
@@ -28,25 +26,25 @@ class Department:
         CONN.commit()
         
     def insert(self):
-        sql = """INSERT INTO department (employee, manager, year) VALUES (?, ?, ?);"""
-        CURSOR.execute(sql, (self.employee, self.manager, self.year))
+        sql = """INSERT INTO department (name) VALUES (?);"""
+        CURSOR.execute(sql, (self.name))
         CONN.commit()
         self.id = CURSOR.lastrowid
 
     @classmethod
-    def save(cls, employee, manager, year):
-        department = cls(employee, year, manager)
+    def save(cls, name):
+        department = cls(name)
         department.insert()
         return department
         
     def update(self):
         sql = """UPDATE department SET employee = ?, manager = ?, year = ? WHERE id = ?;"""
-        CURSOR.execute(sql, (self.employee, self.manager, self.year, self.id))
+        CURSOR.execute(sql, (self.name, self.id))
         CONN.commit()
 
     @classmethod
     def instance_by_id(cls, row):
-        return cls(id=row[0], employee=row[1], year=row[3], manager=row[2])
+        return cls(id=row[0], name=row[1])
         
     def delete(self):
         sql = """DELETE FROM department WHERE id = ?;"""
